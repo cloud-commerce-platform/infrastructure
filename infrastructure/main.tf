@@ -1,7 +1,7 @@
 # VPC
 
-data "aws_vpc" "default" {
-  default = true
+module "vpc" {
+  source = "../modules/vpc"
 }
 
 # AMI
@@ -19,14 +19,14 @@ module "iam" {
 
 module "security_group" {
   source = "../modules/security-group"
-  vpc_id = data.aws_vpc.default.id
+  vpc_id = module.vpc.vpc_id
 }
 
 # LB
 
 module "load_balancer" {
   source               = "../modules/load-balancer"
-  vpc_id               = data.aws_vpc.default.id
+  vpc_id               = module.vpc.vpc_id
   subnet_ids           = var.private_subnets
   order_service_alb_id = [module.security_group.order_service_alb_id]
 
@@ -51,12 +51,32 @@ module "rabbitmq_cluster" {
   ami_id                = data.aws_ssm_parameter.ecs_ami.value
   instance_profile_name = module.iam.ecs_instance_profile_name
   target_group_arns     = [module.load_balancer.rabbitmq_tg_arn]
+  desired_capacity      = 1
+  max_size              = 1
 }
 
 # Data-Store
-
+# Redis
 module "data_store" {
   source             = "../modules/data-store"
   subnet_ids         = var.private_subnets
   security_group_ids = [module.security_group.redis_sg_id]
 }
+
+# RDS
+module "order_service_rds" {
+  source = "../modules/rds"
+
+  subnet_ids         = var.private_subnets
+  security_group_ids = [module.security_group.rds_sg_id]
+
+  rds_identifier = "order-service-db"
+  rds_db_name = "orders"
+  rds_db_username = "orders_user"
+  rds_db_password = var.order_service_database_password
+
+  kms_key_id = data.aws_kms_key.containers.arn
+  service_name = "order-service"
+}
+
+

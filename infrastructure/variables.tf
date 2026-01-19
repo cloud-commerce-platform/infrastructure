@@ -1,10 +1,11 @@
-variable "order_service_database_url" {
-  type      = string
+variable "order_service_database_password" {
+  type = string
   sensitive = true
 }
 
+
 variable "inventory_service_database_url" {
-  type = string
+  type      = string
   sensitive = true
 }
 
@@ -18,3 +19,4 @@ variable "aws_region" {
   type        = string
   default     = "us-east-2"
 }
+

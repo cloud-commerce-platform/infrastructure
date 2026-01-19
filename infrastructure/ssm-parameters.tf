@@ -1,8 +1,10 @@
+/*
 resource "aws_ssm_parameter" "order_service_db_url" {
   name  = "/microservices/order-service/database-url"
   type  = "SecureString"
   value = var.order_service_database_url
 }
+*/
 
 resource "aws_ssm_parameter" "redis_host" {
   name  = "/microservices/redis/host"
@@ -34,5 +36,20 @@ resource "aws_ssm_parameter" "inventory_service_db_url" {
   name  = "/microservices/inventory-service/database-url"
   type  = "SecureString"
   value = var.inventory_service_database_url
-
 }
+
+resource "aws_ssm_parameter" "order_service_db_url" {
+  name  = "/order-service/database-url"
+  type  = "SecureString"
+  value = module.order_service_rds.database_url
+
+  key_id = data.aws_kms_key.containers.arn
+}
+
+resource "aws_ssm_parameter" "name" {
+  name = "/order-/database-password" 
+  type = "SecureString"
+  value = var.order_service_database_password
+}
+
+

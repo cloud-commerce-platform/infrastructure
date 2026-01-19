@@ -1,6 +1,6 @@
 # VPC & Network 
 output "vpc_id" {
-  value       = data.aws_vpc.default.id
+  value       = module.vpc.vpc_id
   description = "The ID of the default VPC"
 }
 
