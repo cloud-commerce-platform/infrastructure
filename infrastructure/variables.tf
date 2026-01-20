@@ -4,7 +4,7 @@ variable "order_service_database_password" {
 }
 
 
-variable "inventory_service_database_url" {
+variable "inventory_service_database_password" {
   type      = string
   sensitive = true
 }

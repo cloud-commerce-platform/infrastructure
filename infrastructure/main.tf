@@ -82,4 +82,19 @@ module "order_service_rds" {
   service_name = "order-service"
 }
 
+module "inventory_service_rds" {
+  source = "../modules/rds"
+
+  subnet_ids         = var.private_subnets
+  security_group_ids = [module.security_group.rds_sg_id]
+
+  rds_identifier = "inventory-service-db"
+  rds_db_name = "inventories"
+  rds_db_username = "inventories_user"
+  rds_db_password = var.inventory_service_database_password
+
+  kms_key_id = data.aws_kms_key.containers.arn
+  service_name = "inventory-service"
+}
+
 

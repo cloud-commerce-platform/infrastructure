@@ -1,17 +1,17 @@
 resource "aws_db_subnet_group" "rds" {
-  name        = "rds-subnet-group"
+  name        = "rds-subnet-group-${var.service_name}"
   description = "Subnet group for RDS PostgreSQL instances"
   subnet_ids  = var.subnet_ids
   tags = {
-    Name = "rds-subnet-group"
+    Name = "rds-subnet-group-${var.service_name}"
   }
 }
 
 resource "aws_db_parameter_group" "rds" {
-  name   = "rds-postgresql18-parameter-group"
+  name   = "rds-postgresql18-parameter-group-${var.service_name}"
   family = "postgres18"
   tags = {
-    Name = "rds-postgresql18-parameter-group"
+    Name = "rds-postgresql18-parameter-group-${var.service_name}"
   }
 }
 

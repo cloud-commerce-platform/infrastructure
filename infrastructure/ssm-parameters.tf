@@ -35,7 +35,9 @@ resource "aws_ssm_parameter" "rabbitmq_password" {
 resource "aws_ssm_parameter" "inventory_service_db_url" {
   name  = "/microservices/inventory-service/database-url"
   type  = "SecureString"
-  value = var.inventory_service_database_url
+  value = module.inventory_service_rds.database_url
+
+  key_id = data.aws_kms_key.containers.arn
 }
 
 resource "aws_ssm_parameter" "order_service_db_url" {
@@ -46,10 +48,14 @@ resource "aws_ssm_parameter" "order_service_db_url" {
   key_id = data.aws_kms_key.containers.arn
 }
 
-resource "aws_ssm_parameter" "name" {
-  name = "/order-/database-password" 
+resource "aws_ssm_parameter" "order_service_password" {
+  name = "/order-service/database-password" 
   type = "SecureString"
   value = var.order_service_database_password
 }
 
-
+resource "aws_ssm_parameter" "inventory_service_password" {
+  name = "/inventory-service/database-password" 
+  type = "SecureString"
+  value = var.inventory_service_database_password
+}

@@ -81,6 +81,10 @@ output "ssm_order_service_db_url_arn" {
   value = aws_ssm_parameter.order_service_db_url.arn
 }
 
+output "ssm_inventory_service_db_url_arn" {
+  value = aws_ssm_parameter.inventory_service_db_url.arn
+}
+
 output "ssm_redis_host_arn" {
   value = aws_ssm_parameter.redis_host.arn
 }
@@ -92,11 +96,6 @@ output "ssm_rabbitmq_username_arn" {
 output "ssm_rabbitmq_password_arn" {
   value = aws_ssm_parameter.rabbitmq_password.arn
 }
-
-output "ssm_inventory_service_db_url_arn" {
-  value = aws_ssm_parameter.inventory_service_db_url.arn
-}
-
 
 output "order_service_url" {
   description = "Full URL to access the Order Service"
