@@ -41,6 +41,9 @@ module "services_cluster" {
   subnet_ids            = var.private_subnets
   ami_id                = data.aws_ssm_parameter.ecs_ami.value
   instance_profile_name = module.iam.ecs_instance_profile_name
+  min_size = 1
+  max_size = 2
+  desired_capacity = 1
 }
 
 module "rabbitmq_cluster" {

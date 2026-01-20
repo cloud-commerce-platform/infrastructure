@@ -75,4 +75,6 @@ variable "container_port" {
   default     = null
 }
 
-
+variable "capacity_provider_name" {
+  type = string
+}

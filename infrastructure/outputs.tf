@@ -20,6 +20,11 @@ output "rabbitmq_cluster_id" {
   description = "ID of the RabbitMQ ECS cluster"
 }
 
+output "rabbitmq_capacity_provider_name" {
+  value       = module.rabbitmq_cluster.capacity_provider_name
+  description = "Capacity provider name for RabbitMQ cluster"
+}
+
 # IAM Roles 
 output "ecs_task_execution_role_arn" {
   value       = module.iam.ecs_task_execution_role_arn
@@ -60,6 +65,10 @@ output "rabbitmq_tg_arn" {
 
 output "rabbitmq_nlb_dns" {
   value = module.load_balancer.rabbitmq_nlb_dns
+}
+
+output "capacity_provider_name" {
+  value = module.services_cluster.capacity_provider_name
 }
 
 # ECR 

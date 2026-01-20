@@ -12,6 +12,8 @@ module "rabbitmq_service" {
   security_groups    = [local.infra.rabbitmq_sg_id]
   assign_public_ip   = false
 
+  capacity_provider_name = local.infra.rabbitmq_capacity_provider_name
+
   expose_via_alb   = true
   target_group_arn = local.infra.rabbitmq_tg_arn
   container_name   = "rabbitmq"
@@ -57,6 +59,7 @@ module "order_service" {
     local.infra.order_service_sg_id,
     local.infra.common_sg_id
   ]
+  capacity_provider_name = local.infra.capacity_provider_name
 
   expose_via_alb   = true
   target_group_arn = local.infra.order_service_tg_arn
@@ -119,14 +122,15 @@ module "order_service" {
 }
 
 module "inventory_service" {
-  source             = "../modules/ecs-service"
-  service_name       = "inventory-service"
-  cluster_id         = local.infra.services_cluster_id
-  task_family        = "inventory-service"
-  execution_role_arn = local.infra.ecs_task_execution_role_arn
-  task_role_arn      = local.infra.inventory_service_task_role_arn
-  subnet_ids         = local.infra.private_subnets
-  security_groups    = [local.infra.common_sg_id]
+  source                 = "../modules/ecs-service"
+  service_name           = "inventory-service"
+  cluster_id             = local.infra.services_cluster_id
+  task_family            = "inventory-service"
+  execution_role_arn     = local.infra.ecs_task_execution_role_arn
+  task_role_arn          = local.infra.inventory_service_task_role_arn
+  subnet_ids             = local.infra.private_subnets
+  security_groups        = [local.infra.common_sg_id]
+  capacity_provider_name = local.infra.capacity_provider_name
 
   container_definitions = jsonencode([
     {

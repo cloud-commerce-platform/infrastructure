@@ -63,7 +63,7 @@ resource "aws_lb_target_group" "order_service" {
 
   health_check {
     enabled             = true
-    path                = "/orders"
+    path                = "/health"
     port                = "traffic-port"
     protocol            = "HTTP"
     healthy_threshold   = 2

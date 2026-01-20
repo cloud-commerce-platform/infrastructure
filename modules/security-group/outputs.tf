@@ -16,5 +16,8 @@ output "redis_sg_id" {
 
 output "order_service_alb_id" {
   value = aws_security_group.order_service_alb.id
-  
+}
+
+output "rds_sg_id" { 
+  value = aws_security_group.rds.id
 }

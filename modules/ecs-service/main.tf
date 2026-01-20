@@ -15,7 +15,6 @@ resource "aws_ecs_service" "this" {
   name            = var.service_name
   cluster         = var.cluster_id
   task_definition = aws_ecs_task_definition.main.arn
-  launch_type     = "EC2"
 
   desired_count = var.desired_count
 
@@ -24,10 +23,16 @@ resource "aws_ecs_service" "this" {
 
   # Mala practica, pero estoy en Free tier :v
   force_new_deployment = true
+
   network_configuration {
-    subnets          = var.subnet_ids
-    security_groups  = var.security_groups
-    assign_public_ip = var.assign_public_ip
+    subnets         = var.subnet_ids
+    security_groups = var.security_groups
+  }
+
+  capacity_provider_strategy {
+    capacity_provider = var.capacity_provider_name
+    weight            = 1
+    base              = 1
   }
 
   dynamic "load_balancer" {

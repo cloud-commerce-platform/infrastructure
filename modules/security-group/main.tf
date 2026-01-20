@@ -46,7 +46,6 @@ resource "aws_security_group" "order_service" {
   vpc_id      = var.vpc_id
 
   ingress {
-    description     = "HTTP access to order-service from ALB"
     from_port       = 3000
     to_port         = 3000
     protocol        = "tcp"
@@ -71,7 +70,6 @@ resource "aws_security_group" "rabbitmq" {
   description = "Security group for rabbitmq ECS tasks"
   vpc_id      = var.vpc_id
 
-  # Trafico desde servicios con common_services SG
   ingress {
     from_port       = 5672
     to_port         = 5672
@@ -87,7 +85,6 @@ resource "aws_security_group" "rabbitmq" {
     cidr_blocks = ["172.31.0.0/16"]
   }
 
-  # Management UI (15672) - acceso interno desde VPC
   ingress {
     from_port   = 15672
     to_port     = 15672
@@ -125,5 +122,29 @@ resource "aws_security_group" "redis" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_security_group" "rds" {
+  name        = "rds-sg"
+  description = "Security group for RDS PostgreSQL instances"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    from_port       = 5432
+    to_port         = 5432
+    protocol        = "tcp"
+    security_groups = [aws_security_group.common_services.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "rds-sg"
   }
 }
