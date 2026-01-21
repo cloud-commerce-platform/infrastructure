@@ -4,6 +4,18 @@ module "vpc" {
   source = "../modules/vpc"
 }
 
+# Cloud Map Namespace for Service Connect
+resource "aws_service_discovery_private_dns_namespace" "main" {
+  name        = "commerce-platform.local"
+  description = "Namespace for ECS Service Connect communication"
+  vpc         = module.vpc.vpc_id
+
+  tags = {
+    Service = "service-connect"
+    Project = "commerce-platform"
+  }
+}
+
 # AMI
 data "aws_ssm_parameter" "ecs_ami" {
   name = "/aws/service/ecs/optimized-ami/amazon-linux-2/recommended/image_id"
@@ -41,9 +53,9 @@ module "services_cluster" {
   subnet_ids            = var.private_subnets
   ami_id                = data.aws_ssm_parameter.ecs_ami.value
   instance_profile_name = module.iam.ecs_instance_profile_name
-  min_size = 1
-  max_size = 2
-  desired_capacity = 1
+  min_size              = 1
+  max_size              = 2
+  desired_capacity      = 1
 }
 
 module "rabbitmq_cluster" {
@@ -53,7 +65,6 @@ module "rabbitmq_cluster" {
   subnet_ids            = var.private_subnets
   ami_id                = data.aws_ssm_parameter.ecs_ami.value
   instance_profile_name = module.iam.ecs_instance_profile_name
-  target_group_arns     = [module.load_balancer.rabbitmq_tg_arn]
   desired_capacity      = 1
   max_size              = 1
 }
@@ -73,12 +84,12 @@ module "order_service_rds" {
   subnet_ids         = var.private_subnets
   security_group_ids = [module.security_group.rds_sg_id]
 
-  rds_identifier = "order-service-db"
-  rds_db_name = "orders"
+  rds_identifier  = "order-service-db"
+  rds_db_name     = "orders"
   rds_db_username = "orders_user"
   rds_db_password = var.order_service_database_password
 
-  kms_key_id = data.aws_kms_key.containers.arn
+  kms_key_id   = data.aws_kms_key.containers.arn
   service_name = "order-service"
 }
 
@@ -88,12 +99,12 @@ module "inventory_service_rds" {
   subnet_ids         = var.private_subnets
   security_group_ids = [module.security_group.rds_sg_id]
 
-  rds_identifier = "inventory-service-db"
-  rds_db_name = "inventories"
+  rds_identifier  = "inventory-service-db"
+  rds_db_name     = "inventories"
   rds_db_username = "inventories_user"
   rds_db_password = var.inventory_service_database_password
 
-  kms_key_id = data.aws_kms_key.containers.arn
+  kms_key_id   = data.aws_kms_key.containers.arn
   service_name = "inventory-service"
 }
 

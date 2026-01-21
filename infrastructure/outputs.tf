@@ -9,6 +9,27 @@ output "private_subnets" {
   description = "List of private subnet IDs"
 }
 
+# Service Discovery for Service Connect
+output "service_discovery_namespace_arn" {
+  description = "ARN of the Cloud Map namespace for Service Connect"
+  value       = aws_service_discovery_private_dns_namespace.main.arn
+}
+
+output "service_discovery_namespace_id" {
+  description = "ID of the Cloud Map namespace for Service Connect"
+  value       = aws_service_discovery_private_dns_namespace.main.id
+}
+
+output "service_discovery_namespace_name" {
+  description = "DNS name of the Cloud Map namespace (commerce-platform.local)"
+  value       = aws_service_discovery_private_dns_namespace.main.name
+}
+
+output "rabbitmq_service_discovery_dns" {
+  description = "DNS name for RabbitMQ via Service Connect"
+  value       = "rabbitmq.${aws_service_discovery_private_dns_namespace.main.name}"
+}
+
 # ECS Clusters 
 output "services_cluster_id" {
   value       = module.services_cluster.cluster_id
@@ -54,18 +75,18 @@ output "common_sg_id" {
   value = module.security_group.common_sg_id
 }
 
-# Load Balancers 
+# Load Balancers
 output "order_service_tg_arn" {
   value = module.load_balancer.order_service_tg_arn
 }
 
-output "rabbitmq_tg_arn" {
-  value = module.load_balancer.rabbitmq_tg_arn
-}
-
-output "rabbitmq_nlb_dns" {
-  value = module.load_balancer.rabbitmq_nlb_dns
-}
+# NLB resources - DEPRECATED: Using Service Connect instead
+# output "rabbitmq_tg_arn" {
+#   value = module.load_balancer.rabbitmq_tg_arn
+# }
+# output "rabbitmq_nlb_dns" {
+#   value = module.load_balancer.rabbitmq_nlb_dns
+# }
 
 output "capacity_provider_name" {
   value = module.services_cluster.capacity_provider_name
@@ -103,13 +124,13 @@ output "order_service_url" {
 }
 
 output "rabbitmq_connection_info" {
-  description = "Connection information for RabbitMQ"
+  description = "Connection information for RabbitMQ via Service Connect"
   value = {
-    nlb_dns            = module.load_balancer.rabbitmq_nlb_dns
-    username_parameter = aws_ssm_parameter.rabbitmq_username.name
-    password_parameter = aws_ssm_parameter.rabbitmq_password.name
-    port               = 5672
-    management_port    = 15672
+    service_discovery_dns = "rabbitmq.${aws_service_discovery_private_dns_namespace.main.name}"
+    port                  = 5672
+    management_port       = 15672
+    username_parameter    = aws_ssm_parameter.rabbitmq_username.name
+    password_parameter    = aws_ssm_parameter.rabbitmq_password.name
   }
   sensitive = true
 }

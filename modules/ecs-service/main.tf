@@ -23,6 +23,9 @@ resource "aws_ecs_service" "this" {
 
   # Mala practica, pero estoy en Free tier :v
   force_new_deployment = true
+  triggers = {
+    redeployment = timestamp()
+  }
 
   network_configuration {
     subnets         = var.subnet_ids
@@ -44,9 +47,30 @@ resource "aws_ecs_service" "this" {
     }
   }
 
-  health_check_grace_period_seconds = 100
+  dynamic "service_connect_configuration" {
+    for_each = var.service_connect_enabled ? [1] : []
+    content {
+      enabled   = true
+      namespace = var.service_connect_namespace
 
-  depends_on = [var.target_group_arn]
+      dynamic "service" {
+        for_each = var.service_connect_service_name != null ? [1] : []
+        content {
+          discovery_name = var.service_connect_service_name
+          port_name      = var.service_connect_port_name
 
+          dynamic "client_alias" {
+            for_each = var.service_connect_client_alias != null ? [1] : []
+            content {
+              dns_name = var.service_connect_client_alias.dns_name
+              port     = var.service_connect_client_alias.port
+            }
+          }
+        }
+      }
+    }
+  }
+
+  health_check_grace_period_seconds = 300
 }
 

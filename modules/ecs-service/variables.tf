@@ -78,3 +78,37 @@ variable "container_port" {
 variable "capacity_provider_name" {
   type = string
 }
+
+# Service Connect Configuration
+variable "service_connect_enabled" {
+  description = "Enable Service Connect for service-to-service communication"
+  type        = bool
+  default     = false
+}
+
+variable "service_connect_namespace" {
+  description = "ARN of the Service Connect namespace"
+  type        = string
+  default     = null
+}
+
+variable "service_connect_service_name" {
+  description = "Discovery name for this service in Service Connect (required if service is a server)"
+  type        = string
+  default     = null
+}
+
+variable "service_connect_port_name" {
+  description = "Port name from task definition for Service Connect (required if service is a server)"
+  type        = string
+  default     = null
+}
+
+variable "service_connect_client_alias" {
+  description = "DNS name and port for client connections (required if service is a server)"
+  type = object({
+    dns_name = string
+    port     = number
+  })
+  default = null
+}

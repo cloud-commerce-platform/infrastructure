@@ -1,11 +1,3 @@
-output "rabbitmq_tg_arn" {
-  value = aws_lb_target_group.rabbitmq.arn
-}
-
-output "rabbitmq_nlb_dns" {
-  value = aws_lb.rabbitmq.dns_name
-}
-
 output "order_service_tg_arn" {
   value = aws_lb_target_group.order_service.arn
 }

@@ -1,34 +1,3 @@
-# Network Load Balancer 
-resource "aws_lb" "rabbitmq" {
-  name                             = "rabbitmq-nlb"
-  internal                         = true
-  load_balancer_type               = "network"
-  subnets                          = var.subnet_ids
-  enable_cross_zone_load_balancing = true
-
-  tags = {
-    Service = "rabbitmq"
-  }
-}
-
-resource "aws_lb_listener" "rabbitmq" {
-  load_balancer_arn = aws_lb.rabbitmq.arn
-  port              = 5672
-  protocol          = "TCP"
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.rabbitmq.arn
-  }
-}
-
-resource "aws_lb_target_group" "rabbitmq" {
-  name        = "rabbitmq-tg"
-  port        = 5672
-  protocol    = "TCP"
-  vpc_id      = var.vpc_id
-  target_type = "ip"
-}
-
 # (OrderService)
 resource "aws_lb" "order_service" {
   name               = "order-service-alb"

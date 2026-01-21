@@ -14,10 +14,17 @@ module "rabbitmq_service" {
 
   capacity_provider_name = local.infra.rabbitmq_capacity_provider_name
 
-  expose_via_alb   = true
-  target_group_arn = local.infra.rabbitmq_tg_arn
-  container_name   = "rabbitmq"
-  container_port   = 5672
+  service_connect_enabled      = true
+  service_connect_namespace    = local.infra.service_discovery_namespace_arn
+  service_connect_service_name = "rabbitmq"
+  service_connect_port_name    = "amqp"
+  service_connect_client_alias = {
+    dns_name = "rabbitmq"
+    port     = 5672
+  }
+
+  container_name = "rabbitmq"
+  container_port = 5672
 
   container_definitions = jsonencode([
     {
@@ -28,10 +35,12 @@ module "rabbitmq_service" {
         {
           containerPort = 5672
           protocol      = "tcp"
+          name          = "amqp"
         },
         {
           containerPort = 15672
           protocol      = "tcp"
+          name          = "management"
         }
       ]
 
@@ -66,6 +75,9 @@ module "order_service" {
   container_name   = "order-service"
   container_port   = 3000
 
+  service_connect_enabled   = true
+  service_connect_namespace = local.infra.service_discovery_namespace_arn
+
   container_definitions = jsonencode([
     {
       name      = "order-service"
@@ -94,7 +106,11 @@ module "order_service" {
       environment = [
         {
           name  = "RABBITMQ_HOST"
-          value = local.infra.rabbitmq_nlb_dns
+          value = "rabbitmq"
+        },
+        {
+          name  = "RABBITMQ_PORT"
+          value = "5672"
         },
         {
           name  = "NODE_ENV"
@@ -119,6 +135,10 @@ module "order_service" {
       }
     }
   ])
+
+  depends_on = [
+    module.rabbitmq_service
+  ]
 }
 
 module "inventory_service" {
@@ -131,6 +151,9 @@ module "inventory_service" {
   subnet_ids             = local.infra.private_subnets
   security_groups        = [local.infra.common_sg_id]
   capacity_provider_name = local.infra.capacity_provider_name
+
+  service_connect_enabled   = true
+  service_connect_namespace = local.infra.service_discovery_namespace_arn
 
   container_definitions = jsonencode([
     {
@@ -156,7 +179,11 @@ module "inventory_service" {
       environment = [
         {
           name  = "RABBITMQ_HOST"
-          value = local.infra.rabbitmq_nlb_dns
+          value = "rabbitmq"
+        },
+        {
+          name  = "RABBITMQ_PORT"
+          value = "5672"
         },
         {
           name  = "NODE_ENV"
@@ -174,4 +201,8 @@ module "inventory_service" {
       }
     }
   ])
+
+  depends_on = [
+    module.rabbitmq_service
+  ]
 }
